@@ -15,7 +15,6 @@ const Sentence: React.StatelessComponent<ICombinedSentenceProps> = ({
   handleWordClick,
   sentence
 }) => {
-  window.console.log('render s');
   return (
     <>
       {sentence.words.map((word, wordIndex) => {

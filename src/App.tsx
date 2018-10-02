@@ -59,8 +59,11 @@ class App extends React.Component<{}, IAppState> {
     sentence: number,
     word: number
   ) => {
-    const unknown = this.state.article.paragraphs[paragraph].sentences[sentence]
-      .words[word].unknown;
+    const unknownWord = this.state.article.paragraphs[paragraph].sentences[
+      sentence
+    ].words[word];
+    const { unknown } = unknownWord;
+
     const newState = dotProp.set(
       this.state,
       `article.paragraphs.${paragraph}.sentences.${sentence}.words.${word}.unknown`,

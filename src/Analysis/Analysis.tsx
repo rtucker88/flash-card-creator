@@ -17,6 +17,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Definition from './Definition';
 
 // import { flatten } from 'lodash';
 
@@ -62,7 +63,9 @@ const Analysis: React.StatelessComponent<IAnalysisProps> = ({
                 <TableCell>
                   {value.words.map(word => word.text).join(' ')}
                 </TableCell>
-                <TableCell />
+                <TableCell>
+                  <Definition word={key} />
+                </TableCell>
               </TableRow>
             );
           })}

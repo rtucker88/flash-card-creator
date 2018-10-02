@@ -25,6 +25,8 @@ const styles = (theme: Theme) =>
 
 type IWordCombinedProps = IWordProps & WithStyles<typeof styles>;
 
+const space = ' ';
+
 const Word: React.StatelessComponent<IWordCombinedProps> = ({
   classes,
   onClick,
@@ -41,7 +43,7 @@ const Word: React.StatelessComponent<IWordCombinedProps> = ({
       >
         {word}
       </span>
-      <span> </span>
+      <span>{space}</span>
     </>
   );
 };
