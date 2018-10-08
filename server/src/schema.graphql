@@ -1,0 +1,64 @@
+scalar DateTime
+
+type Query {
+  articles: [Article!]!
+  article(id: ID!): Article
+  users: [User!]!
+  user(id: ID!): User
+  paragraph(id: ID!): Paragraph
+  sentence(id: ID!): Sentence
+  translation(id: ID!): Translation
+  word(id: ID!): Word
+}
+
+type Mutation {
+  createUser(email: String!): User!
+  createArticle(
+    title: String!
+    content: String!
+    authorEmail: String!
+    fromLanguage: String!
+    toLanguage: String!
+  ): Article!
+  deleteArticle(id: ID!): Article
+  markWordUnknown(id: ID!, unknown: Boolean!): Word
+}
+
+type User {
+  id: ID!
+  email: String!
+}
+
+type Article {
+  id: ID!
+  title: String!
+  paragraphs: [Paragraph!]!
+  createdBy: User!
+  fromLanguage: String!
+  toLanguage: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Paragraph {
+  id: ID!
+  sentences: [Sentence!]!
+}
+
+type Sentence {
+  id: ID!
+  words: [Word!]!
+}
+
+type Word {
+  id: ID!
+  value: String!
+  unknown: Boolean!
+  translation: Translation
+}
+
+type Translation {
+  id: ID!
+  from: String!
+  to: String!
+}

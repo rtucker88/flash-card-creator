@@ -1,0 +1,38 @@
+type User {
+  id: ID! @unique
+  email: String! @unique
+}
+
+type Article {
+  id: ID! @unique
+  title: String!
+  paragraphs: [Paragraph!]!
+  createdBy: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  fromLanguage: String!
+  toLanguage: String!
+}
+
+type Paragraph {
+  id: ID! @unique
+  sentences: [Sentence!]!
+}
+
+type Sentence {
+  id: ID! @unique
+  words: [Word!]!
+}
+
+type Word {
+  id: ID! @unique
+  value: String!
+  unknown: Boolean! @default(value: false)
+  translation: Translation
+}
+
+type Translation {
+  id: ID! @unique
+  from: String!
+  to: String!
+}
