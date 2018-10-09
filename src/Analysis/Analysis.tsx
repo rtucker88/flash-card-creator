@@ -1,7 +1,4 @@
 import * as React from 'react';
-import { IArticle, ISentence } from '../resources/article';
-
-import { flatten } from 'lodash';
 
 import {
   createStyles,
@@ -22,7 +19,7 @@ import Definition from './Definition';
 // import { flatten } from 'lodash';
 
 interface IAnalysisProps extends WithStyles<typeof styles> {
-  article: IArticle;
+  article: any;
 }
 
 const styles = (theme: Theme) =>
@@ -41,7 +38,7 @@ const Analysis: React.StatelessComponent<IAnalysisProps> = ({
   article,
   classes
 }) => {
-  const data = processData(article);
+  // const data = processData(article);
 
   return (
     <Paper className={classes.root}>
@@ -54,14 +51,14 @@ const Analysis: React.StatelessComponent<IAnalysisProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {Array.from(data, ([key, value]) => {
+          {Array.from([], ([key, value]) => {
             return (
               <TableRow key={key}>
                 <TableCell component="th" scope="row">
                   {key}
                 </TableCell>
                 <TableCell>
-                  {value.words.map(word => word.text).join(' ')}
+                  {value.words.map((word: any) => word.text).join(' ')}
                 </TableCell>
                 <TableCell>
                   <Definition word={key} />
@@ -77,20 +74,20 @@ const Analysis: React.StatelessComponent<IAnalysisProps> = ({
 
 export default withStyles(styles)(Analysis);
 
-const processData = (article: IArticle) => {
-  // Get all the sentences
-  const sentencesWithUnknowns = flatten(
-    article.paragraphs.map(para => para.sentences)
-  ).filter(sentence => sentence.words.some(word => word.unknown));
+// const processData = (article: IArticle) => {
+//   // Get all the sentences
+//   const sentencesWithUnknowns = flatten(
+//     article.paragraphs.map(para => para.sentences)
+//   ).filter(sentence => sentence.words.some(word => word.unknown));
 
-  const unknownWordMap = new Map<string, ISentence>();
+//   const unknownWordMap = new Map<string, ISentence>();
 
-  // This feels like it's just a reduce
-  sentencesWithUnknowns.forEach(sentence => {
-    const unknownWords = sentence.words.filter(word => word.unknown);
+//   // This feels like it's just a reduce
+//   sentencesWithUnknowns.forEach(sentence => {
+//     const unknownWords = sentence.words.filter(word => word.unknown);
 
-    unknownWords.forEach(word => unknownWordMap.set(word.text, sentence));
-  });
+//     unknownWords.forEach(word => unknownWordMap.set(word.text, sentence));
+//   });
 
-  return unknownWordMap;
-};
+//   return unknownWordMap;
+// };

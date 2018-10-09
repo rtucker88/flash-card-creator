@@ -1,48 +1,41 @@
 import * as React from 'react';
-import { compose, onlyUpdateForKeys, withHandlers } from 'recompose';
+import Sentence, { ISentenceData } from './Sentence';
 
-import { IParagraph } from '../resources/article';
-import Sentence from './Sentence';
+import { flatten } from 'lodash';
+import { shouldUpdate } from 'recompose';
 
 interface IParagraphProps {
-  paragraph: IParagraph;
-  onWordClick: (sentence: number, word: number) => void;
+  paragraph: IParagraphData;
 }
 
-type ICombinedParagraphProps = IParagraphProps & IParagraphPropHandlers;
+export interface IParagraphData {
+  sentences: ISentenceData[];
+  id: string;
+}
 
-const Paragraph: React.StatelessComponent<ICombinedParagraphProps> = ({
-  handleSentenceClick,
+const Paragraph: React.StatelessComponent<IParagraphProps> = ({
   paragraph
 }) => {
   return (
     <p>
-      {paragraph.sentences.map((sentence, sentenceIndex) => {
-        return (
-          <Sentence
-            key={sentenceIndex}
-            onWordClick={handleSentenceClick(sentenceIndex)}
-            sentence={sentence}
-          />
-        );
+      {paragraph.sentences.map(sentence => {
+        return <Sentence key={sentence.id} sentence={sentence} />;
       })}
     </p>
   );
 };
 
-interface IParagraphPropHandlers {
-  handleSentenceClick: (sentence: number) => (word: number) => void;
-}
+const getNumberOfUnknownWords = (sentences: ISentenceData[]): number => {
+  return flatten(
+    sentences.map(sentence => sentence.words.map(word => word.unknown))
+  ).filter(unknown => unknown).length;
+};
 
-const enhance = compose<ICombinedParagraphProps, IParagraphProps>(
-  withHandlers<IParagraphProps, IParagraphPropHandlers>({
-    handleSentenceClick: ({ onWordClick }) => (sentence: number) => (
-      word: number
-    ) => {
-      onWordClick(sentence, word);
-    }
-  }),
-  onlyUpdateForKeys(['paragraph'])
-);
+const enhance = shouldUpdate<IParagraphProps>((props, nextProps) => {
+  return (
+    getNumberOfUnknownWords(props.paragraph.sentences) !==
+    getNumberOfUnknownWords(nextProps.paragraph.sentences)
+  );
+});
 
 export default enhance(Paragraph);

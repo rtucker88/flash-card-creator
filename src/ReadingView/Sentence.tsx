@@ -1,48 +1,42 @@
 import * as React from 'react';
-import { compose, onlyUpdateForKeys, withHandlers } from 'recompose';
+import Word, { IWordData } from './Word';
 
-import { ISentence } from '../resources/article';
-import Word from './Word';
+import { shouldUpdate } from 'recompose';
 
-interface ISentenceProps {
-  sentence: ISentence;
-  onWordClick: (word: number) => void;
+export interface ISentenceData {
+  id: string;
+  words: [
+    {
+      id: string;
+      value: string;
+      unknown: boolean;
+    }
+  ];
 }
 
-type ICombinedSentenceProps = ISentenceProps & ISentencePropHandlers;
+interface ISentenceProps {
+  sentence: ISentenceData;
+}
 
-const Sentence: React.StatelessComponent<ICombinedSentenceProps> = ({
-  handleWordClick,
-  sentence
-}) => {
+const Sentence: React.StatelessComponent<ISentenceProps> = ({ sentence }) => {
   return (
     <>
-      {sentence.words.map((word, wordIndex) => {
-        return (
-          <React.Fragment key={wordIndex}>
-            <Word
-              onClick={handleWordClick(wordIndex)}
-              unknown={word.unknown}
-              word={word.text}
-            />
-          </React.Fragment>
-        );
+      {sentence.words.map(word => {
+        return <Word key={word.id} word={word} />;
       })}
     </>
   );
 };
 
-interface ISentencePropHandlers {
-  handleWordClick: (word: number) => () => void;
-}
+const getNumberOfUnknownWords = (words: IWordData[]): number => {
+  return words.map(word => word.unknown).filter(unknown => unknown).length;
+};
 
-const enhance = compose<ICombinedSentenceProps, ISentenceProps>(
-  withHandlers<ISentenceProps, ISentencePropHandlers>({
-    handleWordClick: ({ onWordClick }) => (word: number) => () => {
-      onWordClick(word);
-    }
-  }),
-  onlyUpdateForKeys(['sentence'])
-);
+const enhance = shouldUpdate<ISentenceProps>((props, nextProps) => {
+  return (
+    getNumberOfUnknownWords(props.sentence.words) !==
+    getNumberOfUnknownWords(nextProps.sentence.words)
+  );
+});
 
 export default enhance(Sentence);

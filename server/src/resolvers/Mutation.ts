@@ -1,5 +1,11 @@
 import { MutationResolvers } from "../generated/resolvers";
 import { TypeMap } from "./types/TypeMap";
+import {
+  ParagraphCreateManyInput,
+  SentenceCreateManyInput,
+  WordCreateManyInput
+} from "../generated/prisma-client";
+import { sentences } from "sbd";
 
 export interface MutationParent {}
 
@@ -12,19 +18,7 @@ export const Mutation: MutationResolvers.Type<TypeMap> = {
           email: args.authorEmail
         }
       },
-      paragraphs: {
-        create: {
-          sentences: {
-            create: {
-              words: {
-                create: {
-                  value: "hello"
-                }
-              }
-            }
-          }
-        }
-      },
+      paragraphs: getParagraphs(args.content),
       fromLanguage: args.fromLanguage,
       toLanguage: args.toLanguage
     });
@@ -39,4 +33,32 @@ export const Mutation: MutationResolvers.Type<TypeMap> = {
       where: { id },
       data: { unknown }
     })
+};
+
+// TODO: Figure out a better place for this
+const getParagraphs = (article: string): ParagraphCreateManyInput => {
+  return {
+    create: article
+      .split("\n")
+      .filter(para => para !== "")
+      .map(para => ({
+        sentences: getSentences(para)
+      }))
+  };
+};
+
+const getSentences = (paragraph: string): SentenceCreateManyInput => {
+  return {
+    create: sentences(paragraph).map((sentence: string) => ({
+      words: getWords(sentence)
+    }))
+  };
+};
+
+const getWords = (sentence: string): WordCreateManyInput => {
+  return {
+    create: sentence.split(" ").map(word => ({
+      value: word
+    }))
+  };
 };

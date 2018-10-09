@@ -1,14 +1,10 @@
 import * as React from 'react';
-import { compose, withHandlers } from 'recompose';
+import { compose } from 'recompose';
 
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
-import { IArticle } from '../resources/article';
-
-import Paragraph from './Paragraph';
-
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 
 import {
   createStyles,
@@ -18,6 +14,29 @@ import {
   WithStyles,
   withStyles
 } from '@material-ui/core';
+import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
+import Paragraph, { IParagraphData } from './Paragraph';
+
+export const GET_ARTICLE = gql`
+  query Article($id: ID!) {
+    article(id: $id) {
+      title
+      id
+      paragraphs {
+        sentences {
+          words {
+            value
+            unknown
+            id
+          }
+          id
+        }
+        id
+      }
+    }
+  }
+`;
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -54,71 +73,67 @@ const styles = (theme: Theme) =>
     }
   });
 
-interface IReadingViewProps {
-  article: IArticle;
-  onWordClick: (paragraph: number, sentence: number, word: number) => void;
+type ICombinedReadingViewProps = WithStyles<typeof styles> &
+  RouteComponentProps<{ articleId: string }>;
+
+interface IReadingViewData {
+  article: {
+    title: string;
+    paragraphs: IParagraphData[];
+  };
 }
 
-type ICombinedReadingViewProps = IReadingViewProps &
-  IReadingViewHandlers &
-  WithStyles<typeof styles>;
-
 const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
-  article,
   classes,
-  handleWordClick
+  match
 }) => {
   return (
-    <main className={classes.layout}>
-      <Paper className={classes.paper}>
-        <Typography variant="title" gutterBottom={true}>
-          {article.title}
-        </Typography>
-        <Grid container={true} spacing={24}>
-          <Grid item={true} sm={12}>
-            {article.paragraphs.map((paragraph, pIdx) => {
-              return (
-                <Paragraph
-                  key={pIdx}
-                  paragraph={paragraph}
-                  onWordClick={handleWordClick(pIdx)}
-                />
-              );
-            })}
-          </Grid>
-        </Grid>
-        <div className={classes.buttons}>
-          <Link to="/analysis" className={classes.nextLink}>
-            <Button
-              color="primary"
-              className={classes.button}
-              variant="contained"
-            >
-              Finish Reading
-            </Button>
-          </Link>
-        </div>
-      </Paper>
-    </main>
+    <Query<IReadingViewData>
+      query={GET_ARTICLE}
+      variables={{ id: match.params.articleId }}
+    >
+      {({ loading, data, error }) => {
+        if (loading) {
+          return null;
+        }
+        if (error) {
+          return null;
+        }
+
+        return (
+          <main className={classes.layout}>
+            <Paper className={classes.paper}>
+              <Typography variant="title" gutterBottom={true}>
+                {data!.article.title}
+              </Typography>
+              <Grid container={true} spacing={24}>
+                <Grid item={true} sm={12}>
+                  {data!.article.paragraphs.map((paragraph: any) => {
+                    return (
+                      <Paragraph key={paragraph.id} paragraph={paragraph} />
+                    );
+                  })}
+                </Grid>
+              </Grid>
+              <div className={classes.buttons}>
+                <Link to="/analysis" className={classes.nextLink}>
+                  <Button
+                    color="primary"
+                    className={classes.button}
+                    variant="contained"
+                  >
+                    Finish Reading
+                  </Button>
+                </Link>
+              </div>
+            </Paper>
+          </main>
+        );
+      }}
+    </Query>
   );
 };
 
-interface IReadingViewHandlers {
-  handleWordClick: (
-    paragraph: number
-  ) => (sentence: number, word: number) => void;
-}
-
-const enhance = compose<ICombinedReadingViewProps, IReadingViewProps>(
-  withStyles(styles),
-  withHandlers<IReadingViewProps, IReadingViewHandlers>({
-    handleWordClick: ({ onWordClick }) => (paragraph: number) => (
-      sentence: number,
-      word: number
-    ) => {
-      onWordClick(paragraph, sentence, word);
-    }
-  })
-);
+const enhance = compose<ICombinedReadingViewProps, {}>(withStyles(styles));
 
 export default enhance(ReadingView);

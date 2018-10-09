@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import * as dotProp from 'dot-prop-immutable';
-
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Analysis from './Analysis/Analysis';
@@ -11,10 +9,10 @@ import NavBar from './NavBar/NavBar';
 import ReadingView from './ReadingView/ReadingView';
 
 import './App.css';
-import { createArticleFromText, IArticle } from './resources/article';
 
+// TODO: Fix this as we move to backend
 interface IAppState {
-  article: IArticle;
+  article: any;
 }
 
 class App extends React.Component<{}, IAppState> {
@@ -35,11 +33,9 @@ class App extends React.Component<{}, IAppState> {
         <NavBar />
         <Switch>
           <Route path="/upload">
-            <ArticleUpload onComplete={this.handleOnCompleteUpload} />
+            <ArticleUpload />
           </Route>
-          <Route path="/reading">
-            <ReadingView article={article} onWordClick={this.handleWordClick} />
-          </Route>
+          <Route path="/reading/:articleId" component={ReadingView} />
           <Route path="/analysis">
             <Analysis article={article} />
           </Route>
@@ -47,31 +43,6 @@ class App extends React.Component<{}, IAppState> {
       </div>
     );
   }
-
-  private handleOnCompleteUpload = (text: string, title: string) => {
-    this.setState({
-      article: createArticleFromText(text, title)
-    });
-  };
-
-  private handleWordClick = (
-    paragraph: number,
-    sentence: number,
-    word: number
-  ) => {
-    const unknownWord = this.state.article.paragraphs[paragraph].sentences[
-      sentence
-    ].words[word];
-    const { unknown } = unknownWord;
-
-    const newState = dotProp.set(
-      this.state,
-      `article.paragraphs.${paragraph}.sentences.${sentence}.words.${word}.unknown`,
-      !unknown
-    );
-
-    this.setState(newState);
-  };
 }
 
 export default App;
