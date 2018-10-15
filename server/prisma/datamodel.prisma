@@ -28,11 +28,9 @@ type Word {
   id: ID! @unique
   value: String!
   unknown: Boolean! @default(value: false)
-  translation: Translation
 }
 
 type Translation {
-  id: ID! @unique
   from: String!
   to: String!
 }

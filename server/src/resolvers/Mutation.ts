@@ -1,16 +1,15 @@
 import { MutationResolvers } from "../generated/resolvers";
+import { ParagraphCreateManyWithoutArticleInput } from "../generated/prisma-client";
+import { flatten } from "lodash";
 import { TypeMap } from "./types/TypeMap";
-import {
-  ParagraphCreateManyInput,
-  SentenceCreateManyInput,
-  WordCreateManyInput
-} from "../generated/prisma-client";
 import { sentences } from "sbd";
 
 export interface MutationParent {}
 
 export const Mutation: MutationResolvers.Type<TypeMap> = {
   createArticle: (_parent, args, ctx) => {
+    const paragraphs = getParagraphs(args.content);
+
     return ctx.db.createArticle({
       title: args.title,
       createdBy: {
@@ -18,7 +17,7 @@ export const Mutation: MutationResolvers.Type<TypeMap> = {
           email: args.authorEmail
         }
       },
-      paragraphs: getParagraphs(args.content),
+      paragraphs,
       fromLanguage: args.fromLanguage,
       toLanguage: args.toLanguage
     });
@@ -36,7 +35,9 @@ export const Mutation: MutationResolvers.Type<TypeMap> = {
 };
 
 // TODO: Figure out a better place for this
-const getParagraphs = (article: string): ParagraphCreateManyInput => {
+const getParagraphs = (
+  article: string
+): ParagraphCreateManyWithoutArticleInput => {
   return {
     create: article
       .split("\n")
@@ -47,7 +48,7 @@ const getParagraphs = (article: string): ParagraphCreateManyInput => {
   };
 };
 
-const getSentences = (paragraph: string): SentenceCreateManyInput => {
+const getSentences = (paragraph: string) => {
   return {
     create: sentences(paragraph).map((sentence: string) => ({
       words: getWords(sentence)
@@ -55,7 +56,7 @@ const getSentences = (paragraph: string): SentenceCreateManyInput => {
   };
 };
 
-const getWords = (sentence: string): WordCreateManyInput => {
+const getWords = (sentence: string) => {
   return {
     create: sentence.split(" ").map(word => ({
       value: word

@@ -8,7 +8,6 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 
 import {
   createStyles,
-  Paper,
   Theme,
   Typography,
   WithStyles,
@@ -16,6 +15,8 @@ import {
 } from '@material-ui/core';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
+
+import PaperLayout from '../PaperLayout';
 import Paragraph, { IParagraphData } from './Paragraph';
 
 export const GET_ARTICLE = gql`
@@ -23,6 +24,8 @@ export const GET_ARTICLE = gql`
     article(id: $id) {
       title
       id
+      fromLanguage
+      toLanguage
       paragraphs {
         sentences {
           words {
@@ -48,28 +51,8 @@ const styles = (theme: Theme) =>
       display: 'flex',
       justifyContent: 'flex-end'
     },
-    layout: {
-      marginLeft: theme.spacing.unit * 2,
-      marginRight: theme.spacing.unit * 2,
-      width: 'auto',
-      [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: 900
-      }
-    },
     nextLink: {
       textDecoration: 'none'
-    },
-    paper: {
-      marginBottom: theme.spacing.unit * 3,
-      marginTop: theme.spacing.unit * 3,
-      padding: theme.spacing.unit * 2,
-      [theme.breakpoints.up(900 + theme.spacing.unit * 3 * 2)]: {
-        marginBottom: theme.spacing.unit * 6,
-        marginTop: theme.spacing.unit * 6,
-        padding: theme.spacing.unit * 3
-      }
     }
   });
 
@@ -77,10 +60,12 @@ type ICombinedReadingViewProps = WithStyles<typeof styles> &
   RouteComponentProps<{ articleId: string }>;
 
 interface IReadingViewData {
-  article: {
-    title: string;
-    paragraphs: IParagraphData[];
-  };
+  article: IArticleData;
+}
+
+export interface IArticleData {
+  title: string;
+  paragraphs: IParagraphData[];
 }
 
 const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
@@ -101,33 +86,32 @@ const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
         }
 
         return (
-          <main className={classes.layout}>
-            <Paper className={classes.paper}>
-              <Typography variant="title" gutterBottom={true}>
-                {data!.article.title}
-              </Typography>
-              <Grid container={true} spacing={24}>
-                <Grid item={true} sm={12}>
-                  {data!.article.paragraphs.map((paragraph: any) => {
-                    return (
-                      <Paragraph key={paragraph.id} paragraph={paragraph} />
-                    );
-                  })}
-                </Grid>
+          <PaperLayout>
+            <Typography variant="title" gutterBottom={true}>
+              {data!.article.title}
+            </Typography>
+            <Grid container={true} spacing={24}>
+              <Grid item={true} sm={12}>
+                {data!.article.paragraphs.map((paragraph: any) => {
+                  return <Paragraph key={paragraph.id} paragraph={paragraph} />;
+                })}
               </Grid>
-              <div className={classes.buttons}>
-                <Link to="/analysis" className={classes.nextLink}>
-                  <Button
-                    color="primary"
-                    className={classes.button}
-                    variant="contained"
-                  >
-                    Finish Reading
-                  </Button>
-                </Link>
-              </div>
-            </Paper>
-          </main>
+            </Grid>
+            <div className={classes.buttons}>
+              <Link
+                to={`/analysis/${match.params.articleId}`}
+                className={classes.nextLink}
+              >
+                <Button
+                  color="primary"
+                  className={classes.button}
+                  variant="contained"
+                >
+                  Finish Reading
+                </Button>
+              </Link>
+            </div>
+          </PaperLayout>
         );
       }}
     </Query>

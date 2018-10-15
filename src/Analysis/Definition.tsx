@@ -5,22 +5,39 @@ import { Query } from 'react-apollo';
 
 import { CircularProgress } from '@material-ui/core';
 
-const GET_DEFINITION = gql`
-  query GetDefinition($word: String!) {
-    getDefinitions(word: $word) {
+const GET_TRANSLATION = gql`
+  query GetTranslations(
+    $fromLanguage: String!
+    $toLanguage: String!
+    $query: String!
+  ) {
+    translation(
+      fromLanguage: $fromLanguage
+      toLanguage: $toLanguage
+      query: $query
+    ) {
       to
     }
   }
 `;
 
 interface IDefinitionProps {
-  word: string;
+  fromLanguage: string;
+  toLanguage: string;
+  query: string;
 }
 
 // TODO: Enhance this with the additional definitions provided
-const Definition: React.StatelessComponent<IDefinitionProps> = ({ word }) => {
+const Definition: React.StatelessComponent<IDefinitionProps> = ({
+  fromLanguage,
+  toLanguage,
+  query
+}) => {
   return (
-    <Query query={GET_DEFINITION} variables={{ word }}>
+    <Query
+      query={GET_TRANSLATION}
+      variables={{ fromLanguage, toLanguage, query }}
+    >
       {({ loading, error, data }) => {
         if (loading) {
           return <CircularProgress />;
@@ -29,8 +46,8 @@ const Definition: React.StatelessComponent<IDefinitionProps> = ({ word }) => {
           return `Error!: ${error}`;
         }
 
-        if (data.getDefinitions.length) {
-          return <span>{data.getDefinitions[0].to}</span>;
+        if (data.translation.length) {
+          return <span>{data.translation[0].to}</span>;
         }
 
         return null;

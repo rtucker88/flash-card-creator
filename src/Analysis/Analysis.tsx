@@ -1,4 +1,8 @@
 import * as React from 'react';
+import { Query } from 'react-apollo';
+import { RouteComponentProps } from 'react-router';
+
+import { flatten } from 'lodash';
 
 import {
   createStyles,
@@ -16,11 +20,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Definition from './Definition';
 
-// import { flatten } from 'lodash';
+import { GET_ARTICLE, IArticleData } from 'src/ReadingView/ReadingView';
+import { ISentenceData } from 'src/ReadingView/Sentence';
 
-interface IAnalysisProps extends WithStyles<typeof styles> {
-  article: any;
-}
+type IAnalysisProps = WithStyles<typeof styles> &
+  RouteComponentProps<{ articleId: string }>;
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -35,59 +39,80 @@ const styles = (theme: Theme) =>
   });
 
 const Analysis: React.StatelessComponent<IAnalysisProps> = ({
-  article,
+  match,
   classes
 }) => {
-  // const data = processData(article);
-
   return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Word</TableCell>
-            <TableCell>Sentence</TableCell>
-            <TableCell>Definition</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Array.from([], ([key, value]) => {
-            return (
-              <TableRow key={key}>
-                <TableCell component="th" scope="row">
-                  {key}
-                </TableCell>
-                <TableCell>
-                  {value.words.map((word: any) => word.text).join(' ')}
-                </TableCell>
-                <TableCell>
-                  <Definition word={key} />
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </Paper>
+    <Query query={GET_ARTICLE} variables={{ id: match.params.articleId }}>
+      {({ loading, data, error }) => {
+        if (loading || error) {
+          return null;
+        }
+
+        return (
+          <Paper className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Word</TableCell>
+                  <TableCell>Sentence</TableCell>
+                  <TableCell>Definition</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.from(processData(data!.article), ([key, value]) => {
+                  return (
+                    <TableRow key={key}>
+                      <TableCell component="th" scope="row">
+                        {key}
+                      </TableCell>
+                      <TableCell>
+                        {value.words.map(
+                          word =>
+                            word.value === key ? (
+                              <span>
+                                <em>{`${word.value} `}</em>
+                              </span>
+                            ) : (
+                              <span>{`${word.value} `}</span>
+                            )
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Definition
+                          query={key}
+                          fromLanguage={data!.article.fromLanguage}
+                          toLanguage={data!.article.toLanguage}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Paper>
+        );
+      }}
+    </Query>
   );
 };
 
 export default withStyles(styles)(Analysis);
 
-// const processData = (article: IArticle) => {
-//   // Get all the sentences
-//   const sentencesWithUnknowns = flatten(
-//     article.paragraphs.map(para => para.sentences)
-//   ).filter(sentence => sentence.words.some(word => word.unknown));
+const processData = (article: IArticleData) => {
+  // Get all the sentences
+  const sentencesWithUnknowns = flatten(
+    article.paragraphs.map(para => para.sentences)
+  ).filter(sentence => sentence.words.some(word => word.unknown));
 
-//   const unknownWordMap = new Map<string, ISentence>();
+  const unknownWordMap = new Map<string, ISentenceData>();
 
-//   // This feels like it's just a reduce
-//   sentencesWithUnknowns.forEach(sentence => {
-//     const unknownWords = sentence.words.filter(word => word.unknown);
+  // This feels like it's just a reduce
+  sentencesWithUnknowns.forEach(sentence => {
+    const unknownWords = sentence.words.filter(word => word.unknown);
 
-//     unknownWords.forEach(word => unknownWordMap.set(word.text, sentence));
-//   });
+    unknownWords.forEach(word => unknownWordMap.set(word.value, sentence));
+  });
 
-//   return unknownWordMap;
-// };
+  return unknownWordMap;
+};

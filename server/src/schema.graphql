@@ -7,7 +7,12 @@ type Query {
   user(id: ID!): User
   paragraph(id: ID!): Paragraph
   sentence(id: ID!): Sentence
-  translation(id: ID!): Translation
+  translation(
+    fromLanguage: String!
+    toLanguage: String!
+    query: String!
+  ): [Translation!]!
+  getUnknownWordsFromArticle(id: ID!): [Word!]!
   word(id: ID!): Word
 }
 
@@ -54,11 +59,9 @@ type Word {
   id: ID!
   value: String!
   unknown: Boolean!
-  translation: Translation
 }
 
 type Translation {
-  id: ID!
   from: String!
   to: String!
 }

@@ -7,15 +7,16 @@ import {
   WithStyles,
   withStyles
 } from '@material-ui/core/styles';
+
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { Link } from 'react-router-dom';
+
+import StyledLink from '../StyledLink';
 
 const styles = (theme: Theme) =>
   createStyles({
     homeLink: {
-      color: theme.palette.common.white,
-      textDecoration: 'none'
+      color: theme.palette.common.white
     },
     root: {
       flexGrow: 1
@@ -29,11 +30,11 @@ const NavBar: React.StatelessComponent<INavBarProps> = ({ classes }) => {
     <div className={classes.root}>
       <AppBar position="static" color="primary">
         <Toolbar>
-          <Link to="/upload" className={classes.homeLink}>
+          <StyledLink to="/" className={classes.homeLink}>
             <Typography variant="title" color="inherit">
               Flashcard Creator
             </Typography>
-          </Link>
+          </StyledLink>
         </Toolbar>
       </AppBar>
     </div>

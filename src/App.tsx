@@ -9,36 +9,19 @@ import NavBar from './NavBar/NavBar';
 import ReadingView from './ReadingView/ReadingView';
 
 import './App.css';
+import ListView from './ListView/ListView';
 
-// TODO: Fix this as we move to backend
-interface IAppState {
-  article: any;
-}
-
-class App extends React.Component<{}, IAppState> {
-  constructor(props: IAppState) {
-    super(props);
-
-    this.state = {
-      article: { paragraphs: [], title: '' }
-    };
-  }
-
+class App extends React.Component<{}, {}> {
   public render() {
-    const { article } = this.state;
-
     return (
       <div>
         <CssBaseline />
         <NavBar />
         <Switch>
-          <Route path="/upload">
-            <ArticleUpload />
-          </Route>
+          <Route path="/" component={ListView} exact={true} />
+          <Route path="/upload" component={ArticleUpload} />
           <Route path="/reading/:articleId" component={ReadingView} />
-          <Route path="/analysis">
-            <Analysis article={article} />
-          </Route>
+          <Route path="/analysis/:articleId" component={Analysis} />
         </Switch>
       </div>
     );

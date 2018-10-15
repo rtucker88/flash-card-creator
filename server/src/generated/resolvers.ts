@@ -73,7 +73,9 @@ export namespace QueryResolvers {
   ) => T["SentenceParent"] | null | Promise<T["SentenceParent"] | null>;
 
   export interface ArgsTranslation {
-    id: string;
+    fromLanguage: string;
+    toLanguage: string;
+    query: string;
   }
 
   export type TranslationResolver<T extends ITypeMap> = (
@@ -81,7 +83,18 @@ export namespace QueryResolvers {
     args: ArgsTranslation,
     ctx: T["Context"],
     info: GraphQLResolveInfo
-  ) => T["TranslationParent"] | null | Promise<T["TranslationParent"] | null>;
+  ) => T["TranslationParent"][] | Promise<T["TranslationParent"][]>;
+
+  export interface ArgsGetUnknownWordsFromArticle {
+    id: string;
+  }
+
+  export type GetUnknownWordsFromArticleResolver<T extends ITypeMap> = (
+    parent: T["QueryParent"],
+    args: ArgsGetUnknownWordsFromArticle,
+    ctx: T["Context"],
+    info: GraphQLResolveInfo
+  ) => T["WordParent"][] | Promise<T["WordParent"][]>;
 
   export interface ArgsWord {
     id: string;
@@ -136,7 +149,13 @@ export namespace QueryResolvers {
       args: ArgsTranslation,
       ctx: T["Context"],
       info: GraphQLResolveInfo
-    ) => T["TranslationParent"] | null | Promise<T["TranslationParent"] | null>;
+    ) => T["TranslationParent"][] | Promise<T["TranslationParent"][]>;
+    getUnknownWordsFromArticle: (
+      parent: T["QueryParent"],
+      args: ArgsGetUnknownWordsFromArticle,
+      ctx: T["Context"],
+      info: GraphQLResolveInfo
+    ) => T["WordParent"][] | Promise<T["WordParent"][]>;
     word: (
       parent: T["QueryParent"],
       args: ArgsWord,
@@ -448,13 +467,6 @@ export namespace WordResolvers {
     info: GraphQLResolveInfo
   ) => boolean | Promise<boolean>;
 
-  export type TranslationResolver<T extends ITypeMap> = (
-    parent: T["WordParent"],
-    args: {},
-    ctx: T["Context"],
-    info: GraphQLResolveInfo
-  ) => T["TranslationParent"] | null | Promise<T["TranslationParent"] | null>;
-
   export interface Type<T extends ITypeMap> {
     id: (
       parent: T["WordParent"],
@@ -474,23 +486,10 @@ export namespace WordResolvers {
       ctx: T["Context"],
       info: GraphQLResolveInfo
     ) => boolean | Promise<boolean>;
-    translation: (
-      parent: T["WordParent"],
-      args: {},
-      ctx: T["Context"],
-      info: GraphQLResolveInfo
-    ) => T["TranslationParent"] | null | Promise<T["TranslationParent"] | null>;
   }
 }
 
 export namespace TranslationResolvers {
-  export type IdResolver<T extends ITypeMap> = (
-    parent: T["TranslationParent"],
-    args: {},
-    ctx: T["Context"],
-    info: GraphQLResolveInfo
-  ) => string | Promise<string>;
-
   export type FromResolver<T extends ITypeMap> = (
     parent: T["TranslationParent"],
     args: {},
@@ -506,12 +505,6 @@ export namespace TranslationResolvers {
   ) => string | Promise<string>;
 
   export interface Type<T extends ITypeMap> {
-    id: (
-      parent: T["TranslationParent"],
-      args: {},
-      ctx: T["Context"],
-      info: GraphQLResolveInfo
-    ) => string | Promise<string>;
     from: (
       parent: T["TranslationParent"],
       args: {},

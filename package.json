@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.1.1",
+    "@material-ui/icons": "^3.0.1",
     "apollo-boost": "^0.1.16",
     "classnames": "^2.2.6",
+    "date-fns": "^2.0.0-alpha.22",
     "dot-prop-immutable": "^1.4.0",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.9.2",

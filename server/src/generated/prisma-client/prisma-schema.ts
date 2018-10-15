@@ -216,10 +216,7 @@ type Mutation {
   deleteSentence(where: SentenceWhereUniqueInput!): Sentence
   deleteManySentences(where: SentenceWhereInput): BatchPayload!
   createTranslation(data: TranslationCreateInput!): Translation!
-  updateTranslation(data: TranslationUpdateInput!, where: TranslationWhereUniqueInput!): Translation
   updateManyTranslations(data: TranslationUpdateInput!, where: TranslationWhereInput): BatchPayload!
-  upsertTranslation(where: TranslationWhereUniqueInput!, create: TranslationCreateInput!, update: TranslationUpdateInput!): Translation!
-  deleteTranslation(where: TranslationWhereUniqueInput!): Translation
   deleteManyTranslations(where: TranslationWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
@@ -318,11 +315,11 @@ input ParagraphUpdateInput {
 
 input ParagraphUpdateManyInput {
   create: [ParagraphCreateInput!]
+  update: [ParagraphUpdateWithWhereUniqueNestedInput!]
+  upsert: [ParagraphUpsertWithWhereUniqueNestedInput!]
   delete: [ParagraphWhereUniqueInput!]
   connect: [ParagraphWhereUniqueInput!]
   disconnect: [ParagraphWhereUniqueInput!]
-  update: [ParagraphUpdateWithWhereUniqueNestedInput!]
-  upsert: [ParagraphUpsertWithWhereUniqueNestedInput!]
 }
 
 input ParagraphUpdateWithWhereUniqueNestedInput {
@@ -373,7 +370,6 @@ type Query {
   sentence(where: SentenceWhereUniqueInput!): Sentence
   sentences(where: SentenceWhereInput, orderBy: SentenceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Sentence]!
   sentencesConnection(where: SentenceWhereInput, orderBy: SentenceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SentenceConnection!
-  translation(where: TranslationWhereUniqueInput!): Translation
   translations(where: TranslationWhereInput, orderBy: TranslationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Translation]!
   translationsConnection(where: TranslationWhereInput, orderBy: TranslationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TranslationConnection!
   user(where: UserWhereUniqueInput!): User
@@ -451,11 +447,11 @@ input SentenceUpdateInput {
 
 input SentenceUpdateManyInput {
   create: [SentenceCreateInput!]
+  update: [SentenceUpdateWithWhereUniqueNestedInput!]
+  upsert: [SentenceUpsertWithWhereUniqueNestedInput!]
   delete: [SentenceWhereUniqueInput!]
   connect: [SentenceWhereUniqueInput!]
   disconnect: [SentenceWhereUniqueInput!]
-  update: [SentenceUpdateWithWhereUniqueNestedInput!]
-  upsert: [SentenceUpsertWithWhereUniqueNestedInput!]
 }
 
 input SentenceUpdateWithWhereUniqueNestedInput {
@@ -506,7 +502,6 @@ type Subscription {
 }
 
 type Translation {
-  id: ID!
   from: String!
   to: String!
 }
@@ -522,23 +517,18 @@ input TranslationCreateInput {
   to: String!
 }
 
-input TranslationCreateOneInput {
-  create: TranslationCreateInput
-  connect: TranslationWhereUniqueInput
-}
-
 type TranslationEdge {
   node: Translation!
   cursor: String!
 }
 
 enum TranslationOrderByInput {
-  id_ASC
-  id_DESC
   from_ASC
   from_DESC
   to_ASC
   to_DESC
+  id_ASC
+  id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -546,7 +536,6 @@ enum TranslationOrderByInput {
 }
 
 type TranslationPreviousValues {
-  id: ID!
   from: String!
   to: String!
 }
@@ -569,45 +558,12 @@ input TranslationSubscriptionWhereInput {
   NOT: [TranslationSubscriptionWhereInput!]
 }
 
-input TranslationUpdateDataInput {
-  from: String
-  to: String
-}
-
 input TranslationUpdateInput {
   from: String
   to: String
 }
 
-input TranslationUpdateOneInput {
-  create: TranslationCreateInput
-  update: TranslationUpdateDataInput
-  upsert: TranslationUpsertNestedInput
-  delete: Boolean
-  disconnect: Boolean
-  connect: TranslationWhereUniqueInput
-}
-
-input TranslationUpsertNestedInput {
-  update: TranslationUpdateDataInput!
-  create: TranslationCreateInput!
-}
-
 input TranslationWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
   from: String
   from_not: String
   from_in: [String!]
@@ -639,10 +595,6 @@ input TranslationWhereInput {
   AND: [TranslationWhereInput!]
   OR: [TranslationWhereInput!]
   NOT: [TranslationWhereInput!]
-}
-
-input TranslationWhereUniqueInput {
-  id: ID
 }
 
 type User {
@@ -767,7 +719,6 @@ type Word {
   id: ID!
   value: String!
   unknown: Boolean!
-  translation: Translation
 }
 
 type WordConnection {
@@ -779,7 +730,6 @@ type WordConnection {
 input WordCreateInput {
   value: String!
   unknown: Boolean
-  translation: TranslationCreateOneInput
 }
 
 input WordCreateManyInput {
@@ -832,22 +782,20 @@ input WordSubscriptionWhereInput {
 input WordUpdateDataInput {
   value: String
   unknown: Boolean
-  translation: TranslationUpdateOneInput
 }
 
 input WordUpdateInput {
   value: String
   unknown: Boolean
-  translation: TranslationUpdateOneInput
 }
 
 input WordUpdateManyInput {
   create: [WordCreateInput!]
+  update: [WordUpdateWithWhereUniqueNestedInput!]
+  upsert: [WordUpsertWithWhereUniqueNestedInput!]
   delete: [WordWhereUniqueInput!]
   connect: [WordWhereUniqueInput!]
   disconnect: [WordWhereUniqueInput!]
-  update: [WordUpdateWithWhereUniqueNestedInput!]
-  upsert: [WordUpsertWithWhereUniqueNestedInput!]
 }
 
 input WordUpdateWithWhereUniqueNestedInput {
@@ -892,7 +840,6 @@ input WordWhereInput {
   value_not_ends_with: String
   unknown: Boolean
   unknown_not: Boolean
-  translation: TranslationWhereInput
   AND: [WordWhereInput!]
   OR: [WordWhereInput!]
   NOT: [WordWhereInput!]
