@@ -23,6 +23,8 @@ import Definition from './Definition';
 import { GET_ARTICLE, IArticleData } from 'src/ReadingView/ReadingView';
 import { ISentenceData } from 'src/ReadingView/Sentence';
 
+import NavigationStepper from 'src/NavigationStepper/NavigationStepper';
+
 type IAnalysisProps = WithStyles<typeof styles> &
   RouteComponentProps<{ articleId: string }>;
 
@@ -50,47 +52,50 @@ const Analysis: React.StatelessComponent<IAnalysisProps> = ({
         }
 
         return (
-          <Paper className={classes.root}>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Word</TableCell>
-                  <TableCell>Sentence</TableCell>
-                  <TableCell>Definition</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Array.from(processData(data!.article), ([key, value]) => {
-                  return (
-                    <TableRow key={key}>
-                      <TableCell component="th" scope="row">
-                        {key}
-                      </TableCell>
-                      <TableCell>
-                        {value.words.map(
-                          word =>
-                            word.value === key ? (
-                              <span>
-                                <em>{`${word.value} `}</em>
-                              </span>
-                            ) : (
-                              <span>{`${word.value} `}</span>
-                            )
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Definition
-                          query={key}
-                          fromLanguage={data!.article.fromLanguage}
-                          toLanguage={data!.article.toLanguage}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </Paper>
+          <>
+            <NavigationStepper activeStep={2} articleId={data!.article.id} />
+            <Paper className={classes.root}>
+              <Table className={classes.table}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Word</TableCell>
+                    <TableCell>Sentence</TableCell>
+                    <TableCell>Definition</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Array.from(processData(data!.article), ([key, value]) => {
+                    return (
+                      <TableRow key={key}>
+                        <TableCell component="th" scope="row">
+                          {key}
+                        </TableCell>
+                        <TableCell>
+                          {value.words.map(
+                            word =>
+                              word.value === key ? (
+                                <span>
+                                  <em>{`${word.value} `}</em>
+                                </span>
+                              ) : (
+                                <span>{`${word.value} `}</span>
+                              )
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Definition
+                            query={key}
+                            fromLanguage={data!.article.fromLanguage}
+                            toLanguage={data!.article.toLanguage}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </Paper>
+          </>
         );
       }}
     </Query>

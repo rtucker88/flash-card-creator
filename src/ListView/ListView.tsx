@@ -26,6 +26,8 @@ export const GET_ARTICLES = gql`
       title
       id
       createdAt
+      fromLanguage
+      toLanguage
     }
   }
 `;
@@ -36,6 +38,8 @@ interface IListViewData {
       id: string;
       title: string;
       createdAt: string;
+      fromLanguage: string;
+      toLanguage: string;
     }
   ];
 }
@@ -74,6 +78,8 @@ const ListView: React.StatelessComponent<IListViewProps> = ({ classes }) => {
                     id={article.id}
                     title={article.title}
                     createdAt={article.createdAt}
+                    fromLanguage={article.fromLanguage}
+                    toLanguage={article.toLanguage}
                   />
                   {idx !== data!.articles.length - 1 ? <Divider /> : null}
                 </React.Fragment>

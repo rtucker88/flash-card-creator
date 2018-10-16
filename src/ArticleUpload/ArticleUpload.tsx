@@ -24,6 +24,7 @@ import gql from 'graphql-tag';
 import { Mutation, MutationFn, MutationUpdaterFn } from 'react-apollo';
 import { GET_ARTICLE } from 'src/ReadingView/ReadingView';
 
+import NavigationStepper from '../NavigationStepper/NavigationStepper';
 import PaperLayout from '../PaperLayout';
 
 import { GET_ARTICLES } from 'src/ListView/ListView';
@@ -186,110 +187,113 @@ const ArticleUpload: React.StatelessComponent<ICombinedProps> = ({
 }) => (
   <Mutation mutation={CREATE_ARTICLE} update={updateCreateArticle}>
     {(createArticle, { called, loading, data }) => (
-      <PaperLayout>
-        <Typography variant="title" gutterBottom={true}>
-          Add an Article
-        </Typography>
-        <Grid container={true} spacing={24}>
-          <Grid item={true} xs={12} sm={12}>
-            <TextField
-              required={true}
-              fullWidth={true}
-              id="title"
-              name="title"
-              label="Title"
-              value={title}
-              onChange={onTitleChange(setTitle)}
-            />
+      <>
+        <NavigationStepper activeStep={0} />
+        <PaperLayout>
+          <Typography variant="title" gutterBottom={true}>
+            Add an Article
+          </Typography>
+          <Grid container={true} spacing={24}>
+            <Grid item={true} xs={12} sm={12}>
+              <TextField
+                required={true}
+                fullWidth={true}
+                id="title"
+                name="title"
+                label="Title"
+                value={title}
+                onChange={onTitleChange(setTitle)}
+              />
+            </Grid>
+            <Grid item={true} xs={12} sm={12}>
+              <TextField
+                multiline={true}
+                rows={20}
+                fullWidth={true}
+                required={true}
+                id="article"
+                name="article"
+                label="Article"
+                variant="outlined"
+                value={text}
+                onChange={onTextChange(setText)}
+              />
+            </Grid>
           </Grid>
-          <Grid item={true} xs={12} sm={12}>
-            <TextField
-              multiline={true}
-              rows={20}
-              fullWidth={true}
-              required={true}
-              id="article"
-              name="article"
-              label="Article"
-              variant="outlined"
-              value={text}
-              onChange={onTextChange(setText)}
-            />
-          </Grid>
-        </Grid>
-        <div className={classes.footer}>
-          <div className={classes.footerStart}>
-            <FormControl className={classes.formControl}>
-              <InputLabel
-                required={true}
-                shrink={true}
-                htmlFor="from-label-placeholder"
+          <div className={classes.footer}>
+            <div className={classes.footerStart}>
+              <FormControl className={classes.formControl}>
+                <InputLabel
+                  required={true}
+                  shrink={true}
+                  htmlFor="from-label-placeholder"
+                >
+                  From
+                </InputLabel>
+                <Select
+                  required={true}
+                  value={fromLanguage}
+                  input={<Input name="from" id="from-label-placeholder" />}
+                  displayEmpty={true}
+                  onChange={onFromLanguageChange(setFromLanguage)}
+                  name="from"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={'DE'}>German</MenuItem>
+                  <MenuItem value={'EN'}>English</MenuItem>
+                  <MenuItem value={'FR'}>French</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl className={classes.formControl}>
+                <InputLabel
+                  required={true}
+                  shrink={true}
+                  htmlFor="to-label-placeholder"
+                >
+                  To
+                </InputLabel>
+                <Select
+                  required={true}
+                  value={toLanguage}
+                  input={<Input name="to" id="to-label-placeholder" />}
+                  displayEmpty={true}
+                  onChange={onToLanguageChange(setToLanguage)}
+                  name="to"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={'DE'}>German</MenuItem>
+                  <MenuItem value={'EN'}>English</MenuItem>
+                  <MenuItem value={'FR'}>French</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+            <div className={classes.footerEnd}>
+              <Button
+                className={classes.button}
+                onClick={onCreateArticle(
+                  createArticle,
+                  title,
+                  text,
+                  fromLanguage,
+                  toLanguage
+                )}
+                variant="contained"
+                color="primary"
+                disabled={loading}
               >
-                From
-              </InputLabel>
-              <Select
-                required={true}
-                value={fromLanguage}
-                input={<Input name="from" id="from-label-placeholder" />}
-                displayEmpty={true}
-                onChange={onFromLanguageChange(setFromLanguage)}
-                name="from"
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={'DE'}>German</MenuItem>
-                <MenuItem value={'EN'}>English</MenuItem>
-                <MenuItem value={'FR'}>French</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabel
-                required={true}
-                shrink={true}
-                htmlFor="to-label-placeholder"
-              >
-                To
-              </InputLabel>
-              <Select
-                required={true}
-                value={toLanguage}
-                input={<Input name="to" id="to-label-placeholder" />}
-                displayEmpty={true}
-                onChange={onToLanguageChange(setToLanguage)}
-                name="to"
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={'DE'}>German</MenuItem>
-                <MenuItem value={'EN'}>English</MenuItem>
-                <MenuItem value={'FR'}>French</MenuItem>
-              </Select>
-            </FormControl>
+                Create Article
+              </Button>
+            </div>
           </div>
-          <div className={classes.footerEnd}>
-            <Button
-              className={classes.button}
-              onClick={onCreateArticle(
-                createArticle,
-                title,
-                text,
-                fromLanguage,
-                toLanguage
-              )}
-              variant="contained"
-              color="primary"
-              disabled={loading}
-            >
-              Create Article
-            </Button>
-          </div>
-        </div>
-        {!loading && called ? (
-          <Redirect to={`/reading/${data!.createArticle.id}`} />
-        ) : null}
-      </PaperLayout>
+          {!loading && called ? (
+            <Redirect to={`/reading/${data!.createArticle.id}`} />
+          ) : null}
+        </PaperLayout>
+      </>
     )}
   </Mutation>
 );

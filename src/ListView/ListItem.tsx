@@ -47,12 +47,16 @@ interface IListItemProps {
   id: string;
   title: string;
   createdAt: string;
+  fromLanguage: string;
+  toLanguage: string;
 }
 
 const ListItem: React.StatelessComponent<IListItemProps> = ({
   id,
   title,
-  createdAt
+  createdAt,
+  fromLanguage,
+  toLanguage
 }) => (
   <Mutation mutation={DELETE_ARTICLE} update={updateDeleteArticle}>
     {(deleteArticleFn, {}) => (
@@ -60,7 +64,10 @@ const ListItem: React.StatelessComponent<IListItemProps> = ({
         <StyledLink to={`/reading/${id}`}>
           <ListItemText
             primary={title}
-            secondary={`Created ${formatRelative(createdAt, new Date())}`}
+            secondary={`Created ${formatRelative(
+              createdAt,
+              new Date()
+            )} / ${getLanguageText(fromLanguage, toLanguage)}`}
           />
         </StyledLink>
         <ListItemSecondaryAction>
@@ -79,5 +86,24 @@ const ListItem: React.StatelessComponent<IListItemProps> = ({
 const deleteArticle = (deleteArticleFn: MutationFn, id: string) => (
   _: React.MouseEvent<HTMLButtonElement>
 ) => deleteArticleFn({ variables: { id } });
+
+const getLanguageText = (fromLanguage: string, toLanguage: string): string => {
+  return `${getLanguageFromCode(fromLanguage)} to ${getLanguageFromCode(
+    toLanguage
+  )}`;
+};
+
+// TODO: Add never helper
+const getLanguageFromCode = (language: string): string => {
+  switch (language) {
+    case 'DE':
+      return 'German';
+    case 'FR':
+      return 'French';
+    case 'EN':
+    default:
+      return 'English';
+  }
+};
 
 export default ListItem;

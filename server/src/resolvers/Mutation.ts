@@ -1,6 +1,4 @@
 import { MutationResolvers } from "../generated/resolvers";
-import { ParagraphCreateManyWithoutArticleInput } from "../generated/prisma-client";
-import { flatten } from "lodash";
 import { TypeMap } from "./types/TypeMap";
 import { sentences } from "sbd";
 
@@ -35,9 +33,7 @@ export const Mutation: MutationResolvers.Type<TypeMap> = {
 };
 
 // TODO: Figure out a better place for this
-const getParagraphs = (
-  article: string
-): ParagraphCreateManyWithoutArticleInput => {
+const getParagraphs = (article: string) => {
   return {
     create: article
       .split("\n")

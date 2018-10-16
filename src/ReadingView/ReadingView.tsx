@@ -19,6 +19,8 @@ import { Query } from 'react-apollo';
 import PaperLayout from '../PaperLayout';
 import Paragraph, { IParagraphData } from './Paragraph';
 
+import NavigationStepper from '../NavigationStepper/NavigationStepper';
+
 export const GET_ARTICLE = gql`
   query Article($id: ID!) {
     article(id: $id) {
@@ -43,10 +45,6 @@ export const GET_ARTICLE = gql`
 
 const styles = (theme: Theme) =>
   createStyles({
-    button: {
-      marginLeft: theme.spacing.unit,
-      marginTop: theme.spacing.unit * 3
-    },
     buttons: {
       display: 'flex',
       justifyContent: 'flex-end'
@@ -64,6 +62,7 @@ interface IReadingViewData {
 }
 
 export interface IArticleData {
+  id: string;
   title: string;
   paragraphs: IParagraphData[];
 }
@@ -86,32 +85,33 @@ const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
         }
 
         return (
-          <PaperLayout>
-            <Typography variant="title" gutterBottom={true}>
-              {data!.article.title}
-            </Typography>
-            <Grid container={true} spacing={24}>
-              <Grid item={true} sm={12}>
-                {data!.article.paragraphs.map((paragraph: any) => {
-                  return <Paragraph key={paragraph.id} paragraph={paragraph} />;
-                })}
+          <>
+            <NavigationStepper activeStep={1} articleId={data!.article.id} />
+            <PaperLayout>
+              <Typography variant="title" gutterBottom={true}>
+                {data!.article.title}
+              </Typography>
+              <Grid container={true} spacing={24}>
+                <Grid item={true} sm={12}>
+                  {data!.article.paragraphs.map((paragraph: any) => {
+                    return (
+                      <Paragraph key={paragraph.id} paragraph={paragraph} />
+                    );
+                  })}
+                </Grid>
               </Grid>
-            </Grid>
-            <div className={classes.buttons}>
-              <Link
-                to={`/analysis/${match.params.articleId}`}
-                className={classes.nextLink}
-              >
-                <Button
-                  color="primary"
-                  className={classes.button}
-                  variant="contained"
+              <div className={classes.buttons}>
+                <Link
+                  to={`/analysis/${match.params.articleId}`}
+                  className={classes.nextLink}
                 >
-                  Finish Reading
-                </Button>
-              </Link>
-            </div>
-          </PaperLayout>
+                  <Button color="primary" variant="contained">
+                    Finish Reading
+                  </Button>
+                </Link>
+              </div>
+            </PaperLayout>
+          </>
         );
       }}
     </Query>
