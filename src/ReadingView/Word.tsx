@@ -12,6 +12,9 @@ import {
 } from '@material-ui/core/styles';
 import { compose, shouldUpdate } from 'recompose';
 
+import DefinitionPopup from 'src/DefinitionPopup/DefinitionPopup';
+import Hover from '../Hover';
+
 const UPDATE_UNKNOWN_WORD = gql`
   mutation UpdateUnknownWord($id: ID!, $isUnknown: Boolean!) {
     markWordUnknown(id: $id, unknown: $isUnknown) {
@@ -29,6 +32,8 @@ export interface IWordData {
 }
 
 interface IWordProps {
+  fromLanguage: string;
+  toLanguage: string;
   word: IWordData;
 }
 
@@ -43,28 +48,45 @@ type IWordCombinedProps = IWordProps & WithStyles<typeof styles>;
 
 const space = ' ';
 
-const Word: React.StatelessComponent<IWordCombinedProps> = ({
-  classes,
-  word
-}) => {
-  return (
-    <Mutation mutation={UPDATE_UNKNOWN_WORD} key={word.id}>
-      {(markWordUnknown, { called, loading, data }) => (
-        <>
-          <span
-            onClick={onWordClick(markWordUnknown, word)}
-            className={classNames({
-              [classes.unknown]: word.unknown
-            })}
-          >
-            {word.value}
-          </span>
-          <span>{space}</span>
-        </>
-      )}
-    </Mutation>
-  );
-};
+class Word extends React.Component<IWordCombinedProps> {
+  constructor(props: IWordCombinedProps) {
+    super(props);
+  }
+
+  public render() {
+    const { classes, fromLanguage, toLanguage, word } = this.props;
+
+    return (
+      <Mutation mutation={UPDATE_UNKNOWN_WORD} key={word.id}>
+        {(markWordUnknown, { called, loading, data }) => (
+          <Hover timeout={750}>
+            {({ anchorEl, hoverValid }) => (
+              <>
+                <span
+                  onClick={onWordClick(markWordUnknown, word)}
+                  className={classNames({
+                    [classes.unknown]: word.unknown
+                  })}
+                >
+                  {word.value}
+                </span>
+                <span>{space}</span>
+                <DefinitionPopup
+                  id={word.id}
+                  query={word.value}
+                  open={hoverValid}
+                  anchorEl={anchorEl}
+                  fromLanguage={fromLanguage}
+                  toLanguage={toLanguage}
+                />
+              </>
+            )}
+          </Hover>
+        )}
+      </Mutation>
+    );
+  }
+}
 
 const onWordClick = (
   markWordUnknown: MutationFn,

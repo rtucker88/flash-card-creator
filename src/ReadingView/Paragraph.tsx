@@ -5,7 +5,9 @@ import { flatten } from 'lodash';
 import { shouldUpdate } from 'recompose';
 
 interface IParagraphProps {
+  fromLanguage: string;
   paragraph: IParagraphData;
+  toLanguage: string;
 }
 
 export interface IParagraphData {
@@ -14,12 +16,21 @@ export interface IParagraphData {
 }
 
 const Paragraph: React.StatelessComponent<IParagraphProps> = ({
-  paragraph
+  fromLanguage,
+  paragraph,
+  toLanguage
 }) => {
   return (
     <p>
       {paragraph.sentences.map(sentence => {
-        return <Sentence key={sentence.id} sentence={sentence} />;
+        return (
+          <Sentence
+            key={sentence.id}
+            sentence={sentence}
+            fromLanguage={fromLanguage}
+            toLanguage={toLanguage}
+          />
+        );
       })}
     </p>
   );

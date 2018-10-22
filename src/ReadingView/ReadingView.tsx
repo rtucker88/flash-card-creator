@@ -62,9 +62,11 @@ interface IReadingViewData {
 }
 
 export interface IArticleData {
+  fromLanguage: string;
   id: string;
   title: string;
   paragraphs: IParagraphData[];
+  toLanguage: string;
 }
 
 const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
@@ -95,7 +97,12 @@ const ReadingView: React.StatelessComponent<ICombinedReadingViewProps> = ({
                 <Grid item={true} sm={12}>
                   {data!.article.paragraphs.map((paragraph: any) => {
                     return (
-                      <Paragraph key={paragraph.id} paragraph={paragraph} />
+                      <Paragraph
+                        key={paragraph.id}
+                        paragraph={paragraph}
+                        fromLanguage={data!.article.fromLanguage}
+                        toLanguage={data!.article.toLanguage}
+                      />
                     );
                   })}
                 </Grid>

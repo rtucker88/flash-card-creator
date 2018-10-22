@@ -15,14 +15,27 @@ export interface ISentenceData {
 }
 
 interface ISentenceProps {
+  fromLanguage: string;
   sentence: ISentenceData;
+  toLanguage: string;
 }
 
-const Sentence: React.StatelessComponent<ISentenceProps> = ({ sentence }) => {
+const Sentence: React.StatelessComponent<ISentenceProps> = ({
+  fromLanguage,
+  sentence,
+  toLanguage
+}) => {
   return (
     <>
       {sentence.words.map(word => {
-        return <Word key={word.id} word={word} />;
+        return (
+          <Word
+            key={word.id}
+            word={word}
+            fromLanguage={fromLanguage}
+            toLanguage={toLanguage}
+          />
+        );
       })}
     </>
   );
